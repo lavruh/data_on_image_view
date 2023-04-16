@@ -17,6 +17,7 @@ class EditorScreen extends StatefulWidget {
 
 class _EditorScreenState extends State<EditorScreen> {
   Map<String, ViewPort> ports = {};
+  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -25,9 +26,14 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return RawKeyboardListener(
-      focusNode: FocusNode(),
+      focusNode: _focusNode,
       autofocus: true,
       onKey: (key) {
         if (key is RawKeyDownEvent) {
