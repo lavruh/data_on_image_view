@@ -50,6 +50,7 @@ class _EditorScreenState extends State<EditorScreen> {
             child: (item) => ViewPortWidget(
                   item: item,
                   childWrap: (child) => _getChild(child, item),
+                  data: const {'data': 'text'},
                 )),
         floatingActionButton: FloatingActionButton(
           onPressed: _addViewPort,

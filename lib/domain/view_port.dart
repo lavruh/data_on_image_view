@@ -8,6 +8,8 @@ class ViewPort {
   final Color backgroundColor;
   final Color titleColor;
   final Color textColor;
+  final double textSize;
+  final double titleSize;
 
   const ViewPort({
     required this.id,
@@ -18,9 +20,13 @@ class ViewPort {
     Color? backgroundColor,
     Color? titleColor,
     Color? textColor,
+    double? titleSize,
+    double? textSize,
   })  : backgroundColor = backgroundColor ?? Colors.white70,
         titleColor = titleColor ?? (color ?? Colors.black),
-        textColor = textColor ?? (color ?? Colors.black);
+        textColor = textColor ?? (color ?? Colors.black),
+        titleSize = titleSize ?? 18,
+        textSize = textSize ?? 12;
 
   Map<String, dynamic> toMap() {
     return {
@@ -31,6 +37,8 @@ class ViewPort {
       'backgroundColor': backgroundColor.value,
       'titleColor': titleColor.value,
       'textColor': textColor.value,
+      'titleSize' : titleSize,
+      'textSize' : textSize,
     };
   }
 
@@ -43,6 +51,8 @@ class ViewPort {
       backgroundColor: Color(map['backgroundColor'] ?? Colors.white70),
       titleColor: Color(map['titleColor'] ?? Colors.black),
       textColor: Color(map['textColor'] ?? Colors.black),
+      titleSize: map['titleSize'],
+      textSize: map['textSize'],
     );
   }
 
@@ -54,6 +64,8 @@ class ViewPort {
     Color? backgroundColor,
     Color? titleColor,
     Color? textColor,
+    double? titleSize,
+    double? textSize,
   }) {
     return ViewPort(
       id: id ?? this.id,
@@ -63,6 +75,8 @@ class ViewPort {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       titleColor: titleColor ?? this.titleColor,
       textColor: textColor ?? this.textColor,
+      titleSize: titleSize ?? this.titleSize,
+      textSize: textSize ?? this.textSize,
     );
   }
 }

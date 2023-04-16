@@ -30,6 +30,7 @@ class _ViewPortWidgetState extends State<ViewPortWidget> {
           '${e.key} :  ${e.value}',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: widget.item.textColor,
+            fontSize: widget.item.textSize,
               ),
         ));
       }
@@ -51,7 +52,7 @@ class _ViewPortWidgetState extends State<ViewPortWidget> {
               widget.item.title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: widget.item.titleColor,
-                    fontSize: 20,
+                    fontSize: widget.item.titleSize,
                     fontWeight: FontWeight.bold,
                   ),
             ),
