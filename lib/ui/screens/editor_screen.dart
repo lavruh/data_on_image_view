@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
 import 'package:data_on_image_view/ui/widgets/editor_dialog_widget.dart';
+import 'package:data_on_image_view/ui/widgets/editor_panel_widget.dart';
 import 'package:data_on_image_view/ui/widgets/overview_widget.dart';
 import 'package:data_on_image_view/ui/widgets/view_port_widget.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,11 +21,13 @@ class EditorScreen extends StatefulWidget {
 
 class _EditorScreenState extends State<EditorScreen> {
   Map<String, ViewPort> ports = {};
+  late File img;
   final _focusNode = FocusNode();
 
   @override
   void initState() {
     ports = widget.config.viewPorts;
+    img = widget.config.getFile;
     super.initState();
   }
 
@@ -44,18 +50,21 @@ class _EditorScreenState extends State<EditorScreen> {
         }
       },
       child: Scaffold(
-        body: OverviewWidget(
-            img: widget.config.getFile,
-            viewPorts: ports,
-            child: (item) => ViewPortWidget(
-                  item: item,
-                  childWrap: (child) => _getChild(child, item),
-                  data: const {'data': 'text'},
-                )),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _addViewPort,
-          child: const Icon(Icons.add),
-        ),
+        body: Stack(children: [
+          OverviewWidget(
+              img: img,
+              viewPorts: ports,
+              child: (item) => ViewPortWidget(
+                    item: item,
+                    childWrap: (child) => _getChild(child, item),
+                    data: const {'data': 'text'},
+                  )),
+          EditorPanelWidget(
+            openInEditor: _openEditor,
+            setImagePath: _updateImage,
+            saveConfig: _saveConfig,
+          ),
+        ]),
       ),
     );
   }
@@ -81,15 +90,25 @@ class _EditorScreenState extends State<EditorScreen> {
     setState(() {});
   }
 
-  _addViewPort() {
-    _openEditor(const ViewPort(id: '', x: 0, y: 0, title: ''));
-  }
-
   _openEditor(ViewPort item) async {
     final newItem = await showDialog<ViewPort>(
         context: context, builder: (_) => EditorDialogWidget(item: item));
     if (newItem != null) {
       _updateViewPort(newItem);
+    }
+  }
+
+  _updateImage(String p) {
+    img = File(p);
+    setState(() {});
+  }
+
+  _saveConfig() async {
+    final path = await FilePicker.platform.saveFile();
+    if (path != null) {
+      final file = File(path);
+      final contents = widget.config.copyWith(path: img.path, viewPorts: ports);
+      file.writeAsStringSync(contents.toJson());
     }
   }
 }

@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
-import 'package:data_on_image_view/domain/view_port.dart';
 import 'package:data_on_image_view/ui/screens/editor_screen.dart';
 import 'package:data_on_image_view/ui/screens/overview_screen.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,18 +33,11 @@ class Screen extends StatefulWidget {
 
 class _ScreenState extends State<Screen> {
   late OverviewScreenConfig config;
+  Map<String, Map<String, String>> data = {};
 
   @override
   void initState() {
-    final m = OverviewScreenConfig(
-      path: '/home/lavruh/Documents/20230307_231523.jpg',
-      viewPorts: {
-        'A_3': const ViewPort(id: 'A_3', x: 310, y: 370, title: 'A 3'),
-        'A_4': const ViewPort(
-            id: 'A_4', x: 310, y: 470, title: 'A 4', color: Colors.red),
-      },
-    ).toMap();
-    config = OverviewScreenConfig.fromMap(m);
+    config = OverviewScreenConfig(path: '', viewPorts: {});
     super.initState();
   }
 
@@ -56,15 +51,25 @@ class _ScreenState extends State<Screen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
+                onPressed: () async {
+                  final f = await FilePicker.platform.pickFiles(
+                    dialogTitle: 'Select config file',
+                    allowedExtensions: ['.json'],
+                  );
+                  if (f != null) {
+                    final path = f.paths.first ?? '';
+                    config = OverviewScreenConfig.fromJson(
+                        File(path).readAsStringSync());
+                  }
+                },
+                child: const Text('Open config file')),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => OverviewScreen(
-                      config: config,
-                      data: const {
-                        'A_3': {'Rh': '1235', 'd1': '333'},
-                        'A_4': {'Rh': '1235'},
-                      },
-                    ),
+                    builder: (_) => OverviewScreen(config: config, data: data),
                   ));
                 },
                 child: const Text('Overview')),
@@ -73,19 +78,28 @@ class _ScreenState extends State<Screen> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
                 onPressed: () async {
-                  final s = await Navigator.of(context)
-                      .push(MaterialPageRoute<OverviewScreenConfig>(
-                    builder: (_) => EditorScreen(
-                      config: config,
-                    ),
-                  ));
+                  final s = await Navigator.of(context).push(
+                      MaterialPageRoute<OverviewScreenConfig>(
+                          builder: (_) => EditorScreen(config: config)));
                   if (s != null) {
-                    final tmp = s.toJson();
-                    print(tmp);
-                    config = OverviewScreenConfig.fromJson(tmp);
+                    config = s;
                   }
                 },
                 child: const Text('Editor')),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+                onPressed: () async {
+                  final f = await FilePicker.platform.pickFiles(
+                    dialogTitle: 'Select data file',
+                    allowedExtensions: ['.json'],
+                  );
+                  if (f != null) {
+                    final path = f.paths.first ?? '';
+                  }
+                },
+                child: const Text('Load data')),
           ),
         ],
       ),

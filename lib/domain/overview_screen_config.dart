@@ -30,4 +30,14 @@ class OverviewScreenConfig {
 
   factory OverviewScreenConfig.fromJson(String s) =>
       OverviewScreenConfig.fromMap(jsonDecode(s));
+
+  OverviewScreenConfig copyWith({
+    String? path,
+    Map<String, ViewPort>? viewPorts,
+  }) {
+    return OverviewScreenConfig(
+      path: path ?? this.path,
+      viewPorts: viewPorts ?? this.viewPorts,
+    );
+  }
 }
