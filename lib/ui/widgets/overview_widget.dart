@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:data_on_image_view/domain/view_port.dart';
 import 'package:flutter/material.dart';
 
@@ -17,13 +16,18 @@ class OverviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = FileImage(img);
+    Widget content= const CircularProgressIndicator();
+
+    if(img.existsSync()) {
+      final image = FileImage(img);
+      content = Stack(
+        alignment: AlignmentDirectional.center,
+        children: [Image(image: image), ...viewPorts.values.map(child)],
+      );
+    }
     return Scaffold(
       body: Center(
-        child: Stack(
-          alignment: AlignmentDirectional.center,
-          children: [Image(image: image), ...viewPorts.values.map(child)],
-        ),
+        child: content
       ),
     );
   }

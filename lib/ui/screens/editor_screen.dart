@@ -3,12 +3,11 @@ import 'dart:io';
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
 import 'package:data_on_image_view/ui/widgets/editor_dialog_widget.dart';
-import 'package:data_on_image_view/ui/widgets/editor_panel_widget.dart';
+import 'package:data_on_image_view/ui/widgets/floating_panel_widget.dart';
 import 'package:data_on_image_view/ui/widgets/overview_widget.dart';
 import 'package:data_on_image_view/ui/widgets/view_port_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class EditorScreen extends StatefulWidget {
   const EditorScreen({Key? key, required this.config}) : super(key: key);
@@ -22,7 +21,6 @@ class EditorScreen extends StatefulWidget {
 class _EditorScreenState extends State<EditorScreen> {
   Map<String, ViewPort> ports = {};
   late File img;
-  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -38,34 +36,28 @@ class _EditorScreenState extends State<EditorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
-      focusNode: _focusNode,
-      autofocus: true,
-      onKey: (key) {
-        if (key is RawKeyDownEvent) {
-          if (key.physicalKey == PhysicalKeyboardKey.escape) {
-            Navigator.of(context).pop(OverviewScreenConfig(
-                path: widget.config.path, viewPorts: ports));
-          }
-        }
-      },
-      child: Scaffold(
-        body: Stack(children: [
-          OverviewWidget(
-              img: img,
-              viewPorts: ports,
-              child: (item) => ViewPortWidget(
-                    item: item,
-                    childWrap: (child) => _getChild(child, item),
-                    data: const {'data': 'text'},
-                  )),
-          EditorPanelWidget(
-            openInEditor: _openEditor,
-            setImagePath: _updateImage,
-            saveConfig: _saveConfig,
-          ),
-        ]),
-      ),
+    return Scaffold(
+      body: Stack(children: [
+        OverviewWidget(
+            img: img,
+            viewPorts: ports,
+            child: (item) => ViewPortWidget(
+                  item: item,
+                  childWrap: (child) => _getChild(child, item),
+                  data: const {'data': 'text'},
+                )),
+        FloatingPanelWidget(
+          children: [
+            IconButton(
+                onPressed: _addViewPort,
+                icon: const Icon(Icons.add_to_photos)),
+            IconButton(
+                onPressed: _pickUpImage, icon: const Icon(Icons.image)),
+            IconButton(onPressed: _saveConfig, icon: const Icon(Icons.save)),
+            IconButton(onPressed: _goBack, icon: const Icon(Icons.arrow_back)),
+          ],
+        ),
+      ]),
     );
   }
 
@@ -110,5 +102,26 @@ class _EditorScreenState extends State<EditorScreen> {
       final contents = widget.config.copyWith(path: img.path, viewPorts: ports);
       file.writeAsStringSync(contents.toJson());
     }
+  }
+
+  _addViewPort() {
+    _openEditor(const ViewPort(id: '', x: 0, y: 0, title: ''));
+  }
+
+  void _pickUpImage() async {
+    final filePath = await FilePicker.platform
+        .pickFiles(dialogTitle: 'Open image file', type: FileType.image);
+    if (filePath != null) {
+      if (filePath.paths.isNotEmpty && filePath.paths.first != null) {
+        _updateImage(filePath.paths.first!);
+      }
+    }
+  }
+
+  _goBack() {
+    final returnData =
+        OverviewScreenConfig(path: widget.config.path, viewPorts: ports);
+    print('return build ${context.owner.toString()} widget ${context.widget}');
+    Navigator.of(context).pop(returnData);
   }
 }
