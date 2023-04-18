@@ -5,6 +5,7 @@ import 'package:data_on_image_view/ui/screens/editor_screen.dart';
 import 'package:data_on_image_view/ui/widgets/floating_panel_widget.dart';
 import 'package:data_on_image_view/ui/widgets/overview_widget.dart';
 import 'package:data_on_image_view/ui/widgets/view_port_widget.dart';
+import 'package:data_on_image_view/utils/data_processor.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -110,5 +111,15 @@ class _OverviewScreenState extends State<OverviewScreen> {
     }
   }
 
-  _loadData() {}
+  _loadData() async {
+    final f = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Select data file',
+      allowedExtensions: ['json', 'csv'],
+    );
+    if (f != null) {
+      final path = f.paths.first ?? '';
+      data = DataProcessor().getData(File(path));
+      setState(() {});
+    }
+  }
 }

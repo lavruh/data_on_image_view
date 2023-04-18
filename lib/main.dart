@@ -1,6 +1,5 @@
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/ui/screens/overview_screen.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -54,20 +53,6 @@ class _ScreenState extends State<Screen> {
                   ));
                 },
                 child: const Text('Overview')),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-                onPressed: () async {
-                  final f = await FilePicker.platform.pickFiles(
-                    dialogTitle: 'Select data file',
-                    allowedExtensions: ['.json'],
-                  );
-                  if (f != null) {
-                    final path = f.paths.first ?? '';
-                  }
-                },
-                child: const Text('Load data')),
           ),
         ],
       ),
