@@ -8,12 +8,19 @@ class DataProcessor {
     if (p.extension(f.path) == '.csv') {
       final data = const CsvToListConverter().convert(f.readAsStringSync());
       for (final row in data) {
-        assert(row.length == 3);
-        final m = {row[1].toString(): row[2].toString()};
-        result.update(row[0].toString(), (value) {
-          value.addAll(m);
-          return value;
-        }, ifAbsent: () => m);
+        if (row[0] == 'config') {
+          final m = {'config': row[1].toString()};
+          result.update(row[0].toString(), (value) {
+            value.addAll(m);
+            return value;
+          }, ifAbsent: () => m);
+        } else if (row.length == 3) {
+          final m = {row[1].toString(): row[2].toString()};
+          result.update(row[0].toString(), (value) {
+            value.addAll(m);
+            return value;
+          }, ifAbsent: () => m);
+        }
       }
     }
     if (p.extension(f.path) == '.json') {}

@@ -36,6 +36,40 @@ class _OverviewScreenState extends State<OverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final buttons = Column(mainAxisSize: MainAxisSize.min, children: [
+      TextButton(onPressed: _openConfig, child: const Text('Open config file')),
+      TextButton(onPressed: _loadData, child: const Text('Open data file')),
+    ]);
+
+    final overview = OverviewWidget(
+        img: config.getFile,
+        viewPorts: config.viewPorts,
+        child: (e) {
+          return ViewPortWidget(
+            item: e,
+            data: data[e.id],
+          );
+        });
+
+    final panel = FloatingPanelWidget(
+      initPosition: menuPosition,
+      children: [
+        IconButton(
+            onPressed: () => _openEditor(context),
+            tooltip: 'Edit widgets config',
+            icon: const Icon(Icons.edit)),
+        if (widget.data == null)
+          IconButton(
+              onPressed: () => _loadData(),
+              tooltip: 'Load data file',
+              icon: const Icon(Icons.file_open)),
+        IconButton(
+            onPressed: () => _openConfig(),
+            tooltip: 'Load config file',
+            icon: const Icon(Icons.settings)),
+      ],
+    );
+
     return RawKeyboardListener(
         focusNode: FocusNode(),
         autofocus: true,
@@ -56,35 +90,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 body: Center(
                     child: Stack(
               children: [
-                config.getFile.existsSync() == false
-                    ? TextButton(
-                        onPressed: _openConfig,
-                        child: const Text('Open config file'))
-                    : OverviewWidget(
-                        img: config.getFile,
-                        viewPorts: config.viewPorts,
-                        child: (e) {
-                          return ViewPortWidget(
-                            item: e,
-                            data: data[e.id],
-                          );
-                        }),
-                if (menuVisible)
-                  FloatingPanelWidget(
-                    initPosition: menuPosition,
-                    children: [
-                      IconButton(
-                          onPressed: () => _openEditor(context),
-                          icon: const Icon(Icons.edit)),
-                      if (widget.data == null)
-                        IconButton(
-                            onPressed: () => _loadData(),
-                            icon: const Icon(Icons.file_open)),
-                      IconButton(
-                          onPressed: () => _openConfig(),
-                          icon: const Icon(Icons.settings)),
-                    ],
-                  )
+                if (config.getFile.existsSync() == false) buttons else overview,
+                if (menuVisible) panel
               ],
             )))));
   }
@@ -119,6 +126,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
     if (f != null) {
       final path = f.paths.first ?? '';
       data = DataProcessor().getData(File(path));
+      if (data.containsKey('config')) {
+        final path = data['config'];
+        config = OverviewScreenConfig.fromJson(
+            File(path?['config'] ?? '').readAsStringSync());
+      }
       setState(() {});
     }
   }

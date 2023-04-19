@@ -50,11 +50,20 @@ class _EditorScreenState extends State<EditorScreen> {
           children: [
             IconButton(
                 onPressed: _addViewPort,
+                tooltip: 'Add Viewport',
                 icon: const Icon(Icons.add_to_photos)),
             IconButton(
-                onPressed: _pickUpImage, icon: const Icon(Icons.image)),
-            IconButton(onPressed: _saveConfig, icon: const Icon(Icons.save)),
-            IconButton(onPressed: _goBack, icon: const Icon(Icons.arrow_back)),
+                onPressed: _pickUpImage,
+                tooltip: 'Select image',
+                icon: const Icon(Icons.image)),
+            IconButton(
+                onPressed: _saveConfig,
+                tooltip: 'Save config to file',
+                icon: const Icon(Icons.save)),
+            IconButton(
+                onPressed: _goBack,
+                tooltip: 'Back',
+                icon: const Icon(Icons.arrow_back)),
           ],
         ),
       ]),
@@ -83,9 +92,18 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   _openEditor(ViewPort item) async {
+    final oldID = item.id;
     final newItem = await showDialog<ViewPort>(
-        context: context, builder: (_) => EditorDialogWidget(item: item));
+        context: context,
+        builder: (_) => EditorDialogWidget(
+              item: item,
+              onDelete: () => _removeViewPort(item.id),
+              onDuplicate: () => _duplicateViewPort(item),
+            ));
     if (newItem != null) {
+      if (oldID != newItem.id) {
+        _removeViewPort(oldID);
+      }
       _updateViewPort(newItem);
     }
   }
@@ -121,7 +139,19 @@ class _EditorScreenState extends State<EditorScreen> {
   _goBack() {
     final returnData =
         OverviewScreenConfig(path: widget.config.path, viewPorts: ports);
-    print('return build ${context.owner.toString()} widget ${context.widget}');
     Navigator.of(context).pop(returnData);
+  }
+
+  void _removeViewPort(String oldID) {
+    ports.remove(oldID);
+  }
+
+  _duplicateViewPort(ViewPort item) {
+    final newID = '${item.id}_';
+    _updateViewPort(item.copyWith(
+      id: newID,
+      x: item.x + 50,
+      y: item.y + 50,
+    ));
   }
 }
