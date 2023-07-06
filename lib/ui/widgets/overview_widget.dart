@@ -16,19 +16,24 @@ class OverviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget content= const CircularProgressIndicator();
+    Widget content = const CircularProgressIndicator();
 
-    if(img.existsSync()) {
+    if (img.existsSync()) {
       final image = FileImage(img);
       content = Stack(
-        alignment: AlignmentDirectional.center,
-        children: [Image(image: image), ...viewPorts.values.map(child)],
+        fit: StackFit.expand,
+        alignment: AlignmentDirectional.topStart,
+        children: [
+          Image(
+            image: image,
+            alignment: Alignment.topLeft,
+          ),
+          ...viewPorts.values.map(child)
+        ],
       );
     }
     return Scaffold(
-      body: Center(
-        child: content
-      ),
+      body: content,
     );
   }
 }

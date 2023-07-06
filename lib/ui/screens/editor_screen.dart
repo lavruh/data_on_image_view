@@ -79,7 +79,7 @@ class _EditorScreenState extends State<EditorScreen> {
         onDragEnd: (data) {
           _updateViewPort(item.copyWith(
             x: data.offset.dx,
-            y: data.offset.dy - 20,
+            y: data.offset.dy,
           ));
         },
       ),
