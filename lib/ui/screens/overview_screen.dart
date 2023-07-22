@@ -11,11 +11,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OverviewScreen extends StatefulWidget {
-  const OverviewScreen({Key? key, required this.config, this.data})
-      : super(key: key);
+  const OverviewScreen({
+    Key? key,
+    required this.config,
+    this.data,
+    this.useMenu = true,
+  }) : super(key: key);
 
   final OverviewScreenConfig config;
   final Map<String, Map<String, String>>? data;
+  final bool useMenu;
 
   @override
   State<OverviewScreen> createState() => _OverviewScreenState();
@@ -91,7 +96,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     child: Stack(
               children: [
                 if (config.getFile.existsSync() == false) buttons else overview,
-                if (menuVisible) panel
+                if (menuVisible && widget.useMenu) panel
               ],
             )))));
   }
