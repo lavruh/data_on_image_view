@@ -10,8 +10,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class EditorScreen extends StatefulWidget {
-  const EditorScreen({Key? key, required this.config}) : super(key: key);
+  const EditorScreen(
+      {Key? key, required this.config, this.useBackButton = true})
+      : super(key: key);
 
+  final bool useBackButton;
   final OverviewScreenConfig config;
 
   @override
@@ -60,10 +63,11 @@ class _EditorScreenState extends State<EditorScreen> {
                 onPressed: _saveConfig,
                 tooltip: 'Save config to file',
                 icon: const Icon(Icons.save)),
-            IconButton(
-                onPressed: _goBack,
-                tooltip: 'Back',
-                icon: const Icon(Icons.arrow_back)),
+            if (widget.useBackButton)
+              IconButton(
+                  onPressed: _goBack,
+                  tooltip: 'Back',
+                  icon: const Icon(Icons.arrow_back)),
           ],
         ),
       ]),
