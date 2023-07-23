@@ -1,7 +1,7 @@
 name: data_on_image_view
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.9+1
+version: 1.0.10+1
 
 environment:
   sdk: '>=2.19.6 <3.0.0'

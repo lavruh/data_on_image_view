@@ -24,6 +24,7 @@ class EditorScreen extends StatefulWidget {
 class _EditorScreenState extends State<EditorScreen> {
   Map<String, ViewPort> ports = {};
   late File img;
+  final GlobalKey _widgetKey = GlobalKey();
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _EditorScreenState extends State<EditorScreen> {
     return Scaffold(
       body: Stack(children: [
         OverviewWidget(
+            key: _widgetKey,
             img: img,
             viewPorts: ports,
             child: (item) => ViewPortWidget(
@@ -75,15 +77,18 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   Widget _getChild(Widget child, ViewPort item) {
+    final RenderBox box =
+        _widgetKey.currentContext?.findRenderObject() as RenderBox;
     return GestureDetector(
       onLongPress: () => _openEditor(item),
       child: Draggable(
         feedback: child,
         child: child,
         onDragEnd: (data) {
+          final correctedPoint = box.globalToLocal(data.offset);
           _updateViewPort(item.copyWith(
-            x: data.offset.dx,
-            y: data.offset.dy,
+            x: correctedPoint.dx,
+            y: correctedPoint.dy,
           ));
         },
       ),
