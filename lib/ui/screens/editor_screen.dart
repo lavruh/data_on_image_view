@@ -77,19 +77,21 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   Widget _getChild(Widget child, ViewPort item) {
-    final RenderBox box =
-        _widgetKey.currentContext?.findRenderObject() as RenderBox;
     return GestureDetector(
       onLongPress: () => _openEditor(item),
       child: Draggable(
         feedback: child,
         child: child,
         onDragEnd: (data) {
-          final correctedPoint = box.globalToLocal(data.offset);
-          _updateViewPort(item.copyWith(
-            x: correctedPoint.dx,
-            y: correctedPoint.dy,
-          ));
+          final curContext = _widgetKey.currentContext;
+          if (curContext != null && curContext.mounted) {
+            final RenderBox box = curContext.findRenderObject() as RenderBox;
+            final correctedPoint = box.globalToLocal(data.offset);
+            _updateViewPort(item.copyWith(
+              x: correctedPoint.dx,
+              y: correctedPoint.dy,
+            ));
+          }
         },
       ),
     );
