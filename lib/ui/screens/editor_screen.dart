@@ -65,11 +65,11 @@ class _EditorScreenState extends State<EditorScreen> {
                 onPressed: _saveConfig,
                 tooltip: 'Save config to file',
                 icon: const Icon(Icons.save)),
-            if (widget.useBackButton)
-              IconButton(
-                  onPressed: _goBack,
-                  tooltip: 'Back',
-                  icon: const Icon(Icons.arrow_back)),
+            // if (widget.useBackButton)
+            //   IconButton(
+            //       onPressed: _goBack,
+            //       tooltip: 'Back',
+            //       icon: const Icon(Icons.arrow_back)),
           ],
         ),
       ]),
