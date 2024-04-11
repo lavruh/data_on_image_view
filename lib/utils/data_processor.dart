@@ -6,7 +6,8 @@ class DataProcessor {
   Map<String, Map<String, String>> getData(File f) {
     Map<String, Map<String, String>> result = {};
     if (p.extension(f.path) == '.csv') {
-      final data = const CsvToListConverter().convert(f.readAsStringSync());
+      final dataString = f.readAsStringSync();
+      final data = const CsvToListConverter().convert(dataString);
       for (final row in data) {
         if (row[0] == 'config') {
           final m = {'config': row[1].toString()};

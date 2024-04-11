@@ -42,6 +42,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   @override
   Widget build(BuildContext context) {
     final buttons = Column(mainAxisSize: MainAxisSize.min, children: [
+      TextButton(
+          onPressed: _createConfig, child: const Text('New blank config')),
       TextButton(onPressed: _openConfig, child: const Text('Open config file')),
       TextButton(onPressed: _loadData, child: const Text('Open data file')),
     ]);
@@ -108,7 +110,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
     if (f != null) {
       final path = f.paths.first ?? '';
-      config = OverviewScreenConfig.fromJson(File(path).readAsStringSync());
+        config = OverviewScreenConfig.fromJson(File(path).readAsStringSync());
       setState(() {});
     }
   }
@@ -136,6 +138,18 @@ class _OverviewScreenState extends State<OverviewScreen> {
         config = OverviewScreenConfig.fromJson(
             File(path?['config'] ?? '').readAsStringSync());
       }
+      setState(() {});
+    }
+  }
+
+  void _createConfig() async {
+    final f = await FilePicker.platform.saveFile(
+      dialogTitle: 'Set new config file name',
+      allowedExtensions: ['.json'],
+    );
+    if (f != null) {
+      await File(f).create();
+      config = OverviewScreenConfig(path: f, viewPorts: {});
       setState(() {});
     }
   }
