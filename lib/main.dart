@@ -1,4 +1,6 @@
+import 'package:data_on_image_view/domain/dataview_on_image_state.dart';
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
+import 'package:data_on_image_view/ui/screens/dataview_on_image_screen.dart';
 import 'package:data_on_image_view/ui/screens/overview_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +32,7 @@ class Screen extends StatefulWidget {
 class _ScreenState extends State<Screen> {
   late OverviewScreenConfig config;
   Map<String, Map<String, String>> data = {};
+  final state = DataViewOnImageState();
 
   @override
   void initState() {
@@ -40,22 +43,7 @@ class _ScreenState extends State<Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => OverviewScreen(config: config),
-                  ));
-                },
-                child: const Text('Overview')),
-          ),
-        ],
-      ),
-    ));
+      body: DataViewOnImageScreen(state: state),
+    );
   }
 }

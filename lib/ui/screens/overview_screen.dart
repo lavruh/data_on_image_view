@@ -106,7 +106,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   _openConfig() async {
     final f = await FilePicker.platform.pickFiles(
       dialogTitle: 'Select config file',
-      allowedExtensions: ['.json'],
+      allowedExtensions: ['json'],
+      type: FileType.custom,
     );
     if (f != null) {
       final path = f.paths.first ?? '';
@@ -129,6 +130,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
     final f = await FilePicker.platform.pickFiles(
       dialogTitle: 'Select data file',
       allowedExtensions: ['json', 'csv'],
+      type: FileType.custom,
     );
     if (f != null) {
       final path = f.paths.first ?? '';
@@ -145,7 +147,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   void _createConfig() async {
     final f = await FilePicker.platform.saveFile(
       dialogTitle: 'Set new config file name',
-      allowedExtensions: ['.json'],
+      allowedExtensions: ['json'],
+      type: FileType.custom,
     );
     if (f != null) {
       await File(f).create();
