@@ -1,6 +1,9 @@
 name: win release v2
 on: workflow_dispatch
 
+env:
+  app_name: data_on_image
+
 jobs:
   build:
     name: flutter release v2
@@ -29,12 +32,12 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: data_on_image-windows-${{steps.read-version.outputs.version-number}}.zip
+          filename: ${{env.app_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
           directory: build/windows/x64/runner/Release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: data_on_image-win-${{steps.read-version.outputs.version-number}}
-          files: build/windows/x64/runner/Release/FastFormFiller-windows-${{steps.read-version.outputs.version-number}}.zip
+          tag_name: ${{env.app_name}}-win-${{steps.read-version.outputs.version-number}}
+          files: build/windows/x64/runner/Release/${{env.app_name}}-windows-${{steps.read-version.outputs.version-number}}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
