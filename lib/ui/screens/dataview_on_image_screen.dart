@@ -32,11 +32,11 @@ class _DataViewOnImageScreenState extends State<DataViewOnImageScreen> {
   @override
   Widget build(BuildContext context) {
     final config = state.selectedConfig;
-
     Widget body = Container();
 
     if (config != null) {
       body = OverviewScreen(
+        key: Key(DateTime.now().toString()),
         config: config,
         data: state.data,
         useMenu: false,
@@ -59,16 +59,20 @@ class _DataViewOnImageScreenState extends State<DataViewOnImageScreen> {
         appBar: AppBar(
           actions: [
             IconButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          child: DataViewOnImageSettingsWidget(state: state),
-                        );
-                      });
-                },
-                icon: const Icon(Icons.settings))
+                onPressed: () => state.loadData(),
+                icon: const Icon(Icons.dataset_linked)),
+            if (state.configSelected)
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return Dialog(
+                            child: DataViewOnImageSettingsWidget(state: state),
+                          );
+                        });
+                  },
+                  icon: const Icon(Icons.settings))
           ],
         ),
         body: body);

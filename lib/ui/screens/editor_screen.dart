@@ -11,11 +11,15 @@ import 'package:flutter/material.dart';
 
 class EditorScreen extends StatefulWidget {
   const EditorScreen(
-      {Key? key, required this.config, this.useBackButton = true})
+      {Key? key,
+      required this.config,
+      this.useBackButton = true,
+      this.saveConfig})
       : super(key: key);
 
   final bool useBackButton;
   final OverviewScreenConfig config;
+  final Function(OverviewScreenConfig)? saveConfig;
 
   @override
   State<EditorScreen> createState() => _EditorScreenState();
@@ -125,10 +129,14 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   _saveConfig() async {
+    final contents = widget.config.copyWith(path: img.path, viewPorts: ports);
+    if (widget.saveConfig != null) {
+      widget.saveConfig!(contents);
+      return;
+    }
     final path = await FilePicker.platform.saveFile();
     if (path != null) {
       final file = File(path);
-      final contents = widget.config.copyWith(path: img.path, viewPorts: ports);
       file.writeAsStringSync(contents.toJson());
     }
   }

@@ -16,11 +16,15 @@ class OverviewScreen extends StatefulWidget {
     required this.config,
     this.data,
     this.useMenu = true,
+    this.keyboardShortcuts = false,
+    this.onSaveConfig,
   }) : super(key: key);
 
   final OverviewScreenConfig config;
   final Map<String, Map<String, String>>? data;
   final bool useMenu;
+  final bool keyboardShortcuts;
+  final Function(OverviewScreenConfig)? onSaveConfig;
 
   @override
   State<OverviewScreen> createState() => _OverviewScreenState();
@@ -77,11 +81,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
       ],
     );
 
-    return RawKeyboardListener(
+    return KeyboardListener(
         focusNode: FocusNode(),
         autofocus: true,
-        onKey: (key) {
-          if (key is RawKeyDownEvent) {
+        onKeyEvent: (key) {
+          if(widget.keyboardShortcuts == false) return;
+          if (key is KeyDownEvent) {
             if (key.physicalKey == PhysicalKeyboardKey.escape) {
               Navigator.of(context).pop();
             }
@@ -111,15 +116,23 @@ class _OverviewScreenState extends State<OverviewScreen> {
     );
     if (f != null) {
       final path = f.paths.first ?? '';
-        config = OverviewScreenConfig.fromJson(File(path).readAsStringSync());
+      config = OverviewScreenConfig.fromJson(File(path).readAsStringSync());
       setState(() {});
     }
   }
 
   _openEditor(BuildContext c) async {
-    final s = await Navigator.of(c).push(
-        MaterialPageRoute<OverviewScreenConfig>(
-            builder: (_) => EditorScreen(config: config)));
+    final s =
+        await Navigator.of(c).push(MaterialPageRoute<OverviewScreenConfig>(
+            builder: (_) => EditorScreen(
+                  config: config,
+                  saveConfig: (newConfig) {
+                    config = newConfig;
+                    if (widget.onSaveConfig != null) {
+                      widget.onSaveConfig!(newConfig);
+                    }
+                  },
+                )));
     if (s != null) {
       config = s;
       setState(() {});

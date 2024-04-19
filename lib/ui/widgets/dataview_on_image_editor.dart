@@ -31,17 +31,18 @@ class _DataViewOnImageEditorState extends State<DataViewOnImageEditor> {
         child = EditorScreen(
           config: config,
           useBackButton: false,
+          saveConfig: (newConfig){
+            widget.state.updateConfig(newConfig);
+            widget.state.saveConfigFile();
+          },
         );
       } catch (e) {
         child = Text(e.toString());
       }
     }
 
-    return WillPopScope(
-        onWillPop: () async {
-          widget.state.reloadConfigFile();
-          return true;
-        },
+    return NavigatorPopHandler(
+        onPop: () async => widget.state.reloadConfigFile(),
         child: Scaffold(
           appBar: AppBar(
             actions: [

@@ -46,7 +46,12 @@ class DataViewOnImageState extends ChangeNotifier {
     );
     if (f != null) {
       final path = f.paths.first ?? '';
-      data = DataProcessor().getData(File(path));
+      final dataFile = File(path);
+      data = DataProcessor().getData(dataFile);
+      dataFile.watch().listen((event) {
+        data = DataProcessor().getData(dataFile);
+        notifyListeners();
+      });
       final conf = data["config"]?["config"];
       if (conf != null) {
         setSelectedConfig(conf);
@@ -67,6 +72,13 @@ class DataViewOnImageState extends ChangeNotifier {
   updateConfig(OverviewScreenConfig conf) {
     selectedConfig = conf;
     notifyListeners();
+  }
+
+  saveConfigFile(){
+    final conf = selectedConfig;
+    if(conf != null && selectedConfigPath.isNotEmpty){
+      File(selectedConfigPath).writeAsStringSync(conf.toJson());
+    }
   }
 
   Map<String, bool> getRelatedViewPortIds() {
@@ -136,8 +148,10 @@ class DataViewOnImageState extends ChangeNotifier {
     if (img == null || imgPath == null) return;
 
     final conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
-    final path =
-        await FilePicker.platform.saveFile(dialogTitle: 'Save new config');
+    final path = await FilePicker.platform.saveFile(
+        dialogTitle: 'Save new config',
+        type: FileType.custom,
+        allowedExtensions: ['json']);
     if (path != null) {
       File(path).writeAsStringSync(conf.toJson());
       addConfig(configPath: path);
