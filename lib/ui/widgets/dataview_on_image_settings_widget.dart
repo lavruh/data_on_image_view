@@ -3,8 +3,7 @@ import 'package:data_on_image_view/ui/widgets/editor_widget.dart';
 import 'package:flutter/material.dart';
 
 class DataViewOnImageSettingsWidget extends StatefulWidget {
-  const DataViewOnImageSettingsWidget({Key? key, required this.state})
-      : super(key: key);
+  const DataViewOnImageSettingsWidget({super.key, required this.state});
   final DataViewOnImageState state;
   @override
   State<DataViewOnImageSettingsWidget> createState() =>
@@ -37,7 +36,7 @@ class _DataViewOnImageSettingsWidgetState
         ListTile(
           leading: const Text('Config file:'),
           title: TextButton(
-            onPressed: () => _selectConfigFile(state),
+            onPressed: () => state.selectConfigFile(context),
             child: Text(state.selectedConfigPath),
           ),
           trailing: IconButton(
@@ -67,9 +66,5 @@ class _DataViewOnImageSettingsWidgetState
         isChanged: state.configChanged,
         save: state.updateConfig,
         child: child);
-  }
-
-  void _selectConfigFile(DataViewOnImageState state) {
-    state.selectConfigFile();
   }
 }

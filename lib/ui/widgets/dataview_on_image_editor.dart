@@ -3,8 +3,7 @@ import 'package:data_on_image_view/ui/screens/editor_screen.dart';
 import 'package:flutter/material.dart';
 
 class DataViewOnImageEditor extends StatefulWidget {
-  const DataViewOnImageEditor({Key? key, required this.state})
-      : super(key: key);
+  const DataViewOnImageEditor({super.key, required this.state});
 
   final DataViewOnImageState state;
 
@@ -31,9 +30,12 @@ class _DataViewOnImageEditorState extends State<DataViewOnImageEditor> {
         child = EditorScreen(
           config: config,
           useBackButton: false,
-          saveConfig: (newConfig){
+          saveConfig: (newConfig) {
             widget.state.updateConfig(newConfig);
             widget.state.saveConfigFile();
+          },
+          selectImage: () async {
+            return await widget.state.selectFile(context, 'Select image');
           },
         );
       } catch (e) {
@@ -45,12 +47,7 @@ class _DataViewOnImageEditorState extends State<DataViewOnImageEditor> {
         onPop: () async => widget.state.reloadConfigFile(),
         child: Scaffold(
           appBar: AppBar(
-            actions: [
-              IconButton(
-                  onPressed: () =>
-                      widget.state.showDataViewOnImageSettings(context),
-                  icon: const Icon(Icons.settings))
-            ],
+            actions: [],
           ),
           body: child,
         ));

@@ -1,21 +1,22 @@
 import 'dart:io';
 
+import 'package:data_on_image_view/data/i_file_provider.dart';
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
 import 'package:data_on_image_view/ui/widgets/dataview_on_image_editor.dart';
 import 'package:data_on_image_view/ui/widgets/dataview_on_image_settings_widget.dart';
 import 'package:data_on_image_view/ui/widgets/question_dialog_widget.dart';
 import 'package:data_on_image_view/utils/data_processor.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 class DataViewOnImageState extends ChangeNotifier {
   OverviewScreenConfig? selectedConfig;
   String selectedConfigPath = '';
   Map<String, Map<String, String>> data = {};
   bool configChanged = false;
-
   bool get configSelected => selectedConfig != null;
+  final IFileProvider fileProvider = FileProvider.getInstance();
 
   setSelectedConfig(String path) async {
     final file = File(path);
@@ -32,21 +33,16 @@ class DataViewOnImageState extends ChangeNotifier {
     final config = selectedConfig;
     if (config != null) {
       Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => DataViewOnImageEditor(
-                state: this,
-              )));
+          builder: (context) => DataViewOnImageEditor(state: this)));
     }
   }
 
-  loadData() async {
-    final f = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select data file',
-      allowedExtensions: ['json', 'csv'],
-      type: FileType.custom,
-    );
-    if (f != null) {
-      final path = f.paths.first ?? '';
-      final dataFile = File(path);
+  loadData(BuildContext context) async {
+    try {
+      final dataFile = await fileProvider.selectFile(
+          context: context,
+          title: 'Select data file',
+          allowedExtensions: ['json', 'csv']);
       data = DataProcessor().getData(dataFile);
       dataFile.watch().listen((event) {
         data = DataProcessor().getData(dataFile);
@@ -58,6 +54,8 @@ class DataViewOnImageState extends ChangeNotifier {
       } else {
         notifyListeners();
       }
+    } catch (e) {
+      rethrow;
     }
   }
 
@@ -74,9 +72,9 @@ class DataViewOnImageState extends ChangeNotifier {
     notifyListeners();
   }
 
-  saveConfigFile(){
+  saveConfigFile() {
     final conf = selectedConfig;
-    if(conf != null && selectedConfigPath.isNotEmpty){
+    if (conf != null && selectedConfigPath.isNotEmpty) {
       File(selectedConfigPath).writeAsStringSync(conf.toJson());
     }
   }
@@ -116,46 +114,65 @@ class DataViewOnImageState extends ChangeNotifier {
     return false;
   }
 
-  selectConfigFile() async {
-    final f = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select config file',
-      allowedExtensions: ['.json'],
-    );
-    if (f != null) {
-      final path = f.paths.first ?? '';
+  selectConfigFile(BuildContext context) async {
+    try {
+      final f = await fileProvider.selectFile(
+        context: context,
+        title: 'Select config file',
+      );
+      final path = f.path;
+      setSelectedConfig(path);
       addConfig(configPath: path);
+    } catch (e) {
+      rethrow;
     }
   }
 
   createOrSelectConfig(BuildContext context) async {
+    final c = context;
     final act = await questionDialogWidget(
         context: context,
         question:
             'Config file not found.\n Yes to create new,\n No select existing file.');
     if (act != null) {
-      if (act) {
-        await createConfigFile();
+      if (act && c.mounted) {
+        await createConfigFile(c);
       } else {
-        await selectConfigFile();
+        await selectConfigFile(c);
       }
     }
   }
 
-  Future<void> createConfigFile() async {
-    final img =
-        await FilePicker.platform.pickFiles(dialogTitle: 'Select image file');
-    final imgPath = img?.files.first.path;
-    if (img == null || imgPath == null) return;
+  Future<void> createConfigFile(BuildContext c) async {
+    OverviewScreenConfig? conf;
+    final context = c;
 
-    final conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
-    final path = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save new config',
-        type: FileType.custom,
-        allowedExtensions: ['json']);
-    if (path != null) {
-      File(path).writeAsStringSync(conf.toJson());
-      addConfig(configPath: path);
-    }
+    final img = await fileProvider.selectFile(
+        context: context,
+        title: "Select image file",
+        allowedExtensions: ['png', 'jpg', 'jpeg']);
+    final imgPath = img.path;
+    conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
+    if (!context.mounted) return;
+    final name = await showAdaptiveDialog<String?>(
+        context: context,
+        builder: (context) {
+          return AlertDialog.adaptive(
+            content: TextField(
+              decoration: const InputDecoration(labelText: "Name"),
+              onSubmitted: (v) {
+                Navigator.of(context).pop(v);
+              },
+            ),
+          );
+        });
+    if (name == null) return;
+    final dir = p.dirname(img.path);
+    final path = p.join(dir, '$name.json');
+    // }
+
+    File(path).writeAsStringSync(conf.toJson());
+    addConfig(configPath: path);
   }
 
   void reloadConfigFile() async {
@@ -165,5 +182,15 @@ class DataViewOnImageState extends ChangeNotifier {
   void addConfig({required String configPath}) {
     selectedConfigPath = configPath;
     setSelectedConfig(configPath);
+  }
+
+  Future<File> selectFile(BuildContext context, String title) async {
+    try {
+      final f = await fileProvider.selectFile(context: context, title: title);
+      if (!f.existsSync()) throw Exception('File does not exist');
+      return f;
+    } catch (e) {
+      rethrow;
+    }
   }
 }

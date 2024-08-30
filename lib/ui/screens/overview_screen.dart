@@ -6,25 +6,26 @@ import 'package:data_on_image_view/ui/widgets/floating_panel_widget.dart';
 import 'package:data_on_image_view/ui/widgets/overview_widget.dart';
 import 'package:data_on_image_view/ui/widgets/view_port_widget.dart';
 import 'package:data_on_image_view/utils/data_processor.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({
-    Key? key,
+    super.key,
     required this.config,
     this.data,
     this.useMenu = true,
     this.keyboardShortcuts = false,
-    this.onSaveConfig,
-  }) : super(key: key);
+    required this.onSaveConfig,
+    required this.selectFileDialog,
+  });
 
   final OverviewScreenConfig config;
   final Map<String, Map<String, String>>? data;
   final bool useMenu;
   final bool keyboardShortcuts;
-  final Function(OverviewScreenConfig)? onSaveConfig;
+  final Function(OverviewScreenConfig) onSaveConfig;
+  final Future<File> Function(String title) selectFileDialog;
 
   @override
   State<OverviewScreen> createState() => _OverviewScreenState();
@@ -85,7 +86,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
         focusNode: FocusNode(),
         autofocus: true,
         onKeyEvent: (key) {
-          if(widget.keyboardShortcuts == false) return;
+          if (widget.keyboardShortcuts == false) return;
           if (key is KeyDownEvent) {
             if (key.physicalKey == PhysicalKeyboardKey.escape) {
               Navigator.of(context).pop();
@@ -109,15 +110,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   _openConfig() async {
-    final f = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select config file',
-      allowedExtensions: ['json'],
-      type: FileType.custom,
-    );
-    if (f != null) {
-      final path = f.paths.first ?? '';
-      config = OverviewScreenConfig.fromJson(File(path).readAsStringSync());
+    try {
+      final f = await widget.selectFileDialog("Open config file");
+      config = OverviewScreenConfig.fromJson(f.readAsStringSync());
       setState(() {});
+    } catch (e) {
+      _showSnakbar(e, context);
     }
   }
 
@@ -128,10 +126,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                   config: config,
                   saveConfig: (newConfig) {
                     config = newConfig;
-                    if (widget.onSaveConfig != null) {
-                      widget.onSaveConfig!(newConfig);
-                    }
+                    widget.onSaveConfig(newConfig);
                   },
+                  selectImage: () =>
+                      widget.selectFileDialog("Select image file"),
                 )));
     if (s != null) {
       config = s;
@@ -140,33 +138,31 @@ class _OverviewScreenState extends State<OverviewScreen> {
   }
 
   _loadData() async {
-    final f = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select data file',
-      allowedExtensions: ['json', 'csv'],
-      type: FileType.custom,
-    );
-    if (f != null) {
-      final path = f.paths.first ?? '';
-      data = DataProcessor().getData(File(path));
+    try {
+      final f = await widget.selectFileDialog("Select data file");
+      data = DataProcessor().getData(f);
       if (data.containsKey('config')) {
         final path = data['config'];
         config = OverviewScreenConfig.fromJson(
             File(path?['config'] ?? '').readAsStringSync());
       }
       setState(() {});
+    } catch (e) {
+      _showSnakbar(e, context);
     }
   }
 
   void _createConfig() async {
-    final f = await FilePicker.platform.saveFile(
-      dialogTitle: 'Set new config file name',
-      allowedExtensions: ['json'],
-      type: FileType.custom,
-    );
-    if (f != null) {
-      await File(f).create();
-      config = OverviewScreenConfig(path: f, viewPorts: {});
+    try {
+      final f = await widget.selectFileDialog('Set new config file name');
+      await f.create();
+      config = OverviewScreenConfig(path: f.path, viewPorts: {});
       setState(() {});
+    } catch (e) {
+      _showSnakbar(e, context);
     }
   }
+
+  _showSnakbar(Object e, BuildContext context) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$e")));
 }

@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 
 class EditorDialogWidget extends StatefulWidget {
   const EditorDialogWidget(
-      {Key? key, required this.item, this.onDelete, this.onDuplicate})
-      : super(key: key);
+      {super.key, required this.item, this.onDelete, this.onDuplicate});
   final ViewPort item;
   final Function? onDelete;
   final Function? onDuplicate;
@@ -39,55 +38,57 @@ class _EditorDialogWidgetState extends State<EditorDialogWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: Form(
-        key: formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: idController,
-              decoration: const InputDecoration(labelText: 'Id'),
-              validator: _textValidator,
-            ),
-            TextFormField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
-              validator: _textValidator,
-            ),
-            TextFormField(
-              controller: titleSizeController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Title size'),
-              validator: _numberValidator,
-            ),
-            TextFormField(
-              controller: textSizeController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Text size'),
-              validator: _numberValidator,
-            ),
-            ColorPickButtonWidget(
-                title: 'Background',
-                color: backgroundColor,
-                onAccept: (c) {
-                  backgroundColor = c;
-                  setState(() {});
-                }),
-            ColorPickButtonWidget(
-                title: 'Title',
-                color: titleColor,
-                onAccept: (c) {
-                  titleColor = c;
-                  setState(() {});
-                }),
-            ColorPickButtonWidget(
-                title: 'Text',
-                color: textColor,
-                onAccept: (c) {
-                  textColor = c;
-                  setState(() {});
-                }),
-          ],
+      content: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: idController,
+                decoration: const InputDecoration(labelText: 'Id'),
+                validator: _textValidator,
+              ),
+              TextFormField(
+                controller: titleController,
+                decoration: const InputDecoration(labelText: 'Title'),
+                validator: _textValidator,
+              ),
+              TextFormField(
+                controller: titleSizeController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Title size'),
+                validator: _numberValidator,
+              ),
+              TextFormField(
+                controller: textSizeController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Text size'),
+                validator: _numberValidator,
+              ),
+              ColorPickButtonWidget(
+                  title: 'Background',
+                  color: backgroundColor,
+                  onAccept: (c) {
+                    backgroundColor = c;
+                    setState(() {});
+                  }),
+              ColorPickButtonWidget(
+                  title: 'Title',
+                  color: titleColor,
+                  onAccept: (c) {
+                    titleColor = c;
+                    setState(() {});
+                  }),
+              ColorPickButtonWidget(
+                  title: 'Text',
+                  color: textColor,
+                  onAccept: (c) {
+                    textColor = c;
+                    setState(() {});
+                  }),
+            ],
+          ),
         ),
       ),
       actions: [

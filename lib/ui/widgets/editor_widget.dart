@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 
 class EditorWidget extends StatelessWidget {
   const EditorWidget(
-      {Key? key,
+      {super.key,
       required this.child,
       required this.isSet,
       required this.isChanged,
-      required this.save})
-      : super(key: key);
+      required this.save});
 
   final Widget child;
   final bool isSet;

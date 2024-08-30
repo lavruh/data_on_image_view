@@ -4,8 +4,7 @@ import 'package:data_on_image_view/ui/widgets/dataview_on_image_settings_widget.
 import 'package:flutter/material.dart';
 
 class DataViewOnImageScreen extends StatefulWidget {
-  const DataViewOnImageScreen({Key? key, required this.state})
-      : super(key: key);
+  const DataViewOnImageScreen({super.key, required this.state});
   final DataViewOnImageState state;
   @override
   State<DataViewOnImageScreen> createState() => _DataViewOnImageScreenState();
@@ -40,16 +39,24 @@ class _DataViewOnImageScreenState extends State<DataViewOnImageScreen> {
         config: config,
         data: state.data,
         useMenu: false,
+        onSaveConfig: (conf) {
+          state.updateConfig(conf);
+          state.saveConfigFile();
+        },
+        selectFileDialog: (title) async => state.selectFile(context, title),
       );
     } else {
       body = Center(
         child: Column(
           children: [
             TextButton(
-                onPressed: () => state.createConfigFile(),
+                onPressed: () => state.selectConfigFile(context),
+                child: const Text('Select config file')),
+            TextButton(
+                onPressed: () => state.createConfigFile(context),
                 child: const Text('New blank config')),
             TextButton(
-                onPressed: () => state.loadData(),
+                onPressed: () => state.loadData(context),
                 child: const Text('Open data file')),
           ],
         ),
@@ -59,7 +66,7 @@ class _DataViewOnImageScreenState extends State<DataViewOnImageScreen> {
         appBar: AppBar(
           actions: [
             IconButton(
-                onPressed: () => state.loadData(),
+                onPressed: () => state.loadData(context),
                 icon: const Icon(Icons.dataset_linked)),
             if (state.configSelected)
               IconButton(

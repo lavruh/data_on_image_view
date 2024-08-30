@@ -1,7 +1,6 @@
 import 'package:data_on_image_view/domain/dataview_on_image_state.dart';
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/ui/screens/dataview_on_image_screen.dart';
-import 'package:data_on_image_view/ui/screens/overview_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Screen extends StatefulWidget {
-  const Screen({Key? key}) : super(key: key);
+  const Screen({super.key});
 
   @override
   State<Screen> createState() => _ScreenState();

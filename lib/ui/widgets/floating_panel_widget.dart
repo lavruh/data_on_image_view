@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 class FloatingPanelWidget extends StatefulWidget {
   const FloatingPanelWidget(
-      {Key? key, required this.children, this.initPosition})
-      : super(key: key);
+      {super.key, required this.children, this.initPosition});
   final List<Widget> children;
   final Offset? initPosition;
 

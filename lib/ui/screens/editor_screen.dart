@@ -6,20 +6,20 @@ import 'package:data_on_image_view/ui/widgets/editor_dialog_widget.dart';
 import 'package:data_on_image_view/ui/widgets/floating_panel_widget.dart';
 import 'package:data_on_image_view/ui/widgets/overview_widget.dart';
 import 'package:data_on_image_view/ui/widgets/view_port_widget.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class EditorScreen extends StatefulWidget {
   const EditorScreen(
-      {Key? key,
+      {super.key,
       required this.config,
       this.useBackButton = true,
-      this.saveConfig})
-      : super(key: key);
+      required this.saveConfig,
+      required this.selectImage});
 
   final bool useBackButton;
   final OverviewScreenConfig config;
-  final Function(OverviewScreenConfig)? saveConfig;
+  final Function(OverviewScreenConfig) saveConfig;
+  final Future<File> Function() selectImage;
 
   @override
   State<EditorScreen> createState() => _EditorScreenState();
@@ -130,15 +130,7 @@ class _EditorScreenState extends State<EditorScreen> {
 
   _saveConfig() async {
     final contents = widget.config.copyWith(path: img.path, viewPorts: ports);
-    if (widget.saveConfig != null) {
-      widget.saveConfig!(contents);
-      return;
-    }
-    final path = await FilePicker.platform.saveFile();
-    if (path != null) {
-      final file = File(path);
-      file.writeAsStringSync(contents.toJson());
-    }
+    widget.saveConfig(contents);
   }
 
   _addViewPort() {
@@ -146,12 +138,11 @@ class _EditorScreenState extends State<EditorScreen> {
   }
 
   void _pickUpImage() async {
-    final filePath = await FilePicker.platform
-        .pickFiles(dialogTitle: 'Open image file', type: FileType.image);
-    if (filePath != null) {
-      if (filePath.paths.isNotEmpty && filePath.paths.first != null) {
-        _updateImage(filePath.paths.first!);
-      }
+    try {
+      final img = await widget.selectImage();
+      _updateImage(img.path);
+    } catch (e) {
+      rethrow;
     }
   }
 
