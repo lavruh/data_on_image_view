@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:data_on_image_view/data/i_file_provider.dart';
 import 'package:data_on_image_view/domain/overview_screen_config.dart';
 import 'package:data_on_image_view/domain/view_port.dart';
 import 'package:data_on_image_view/ui/widgets/dataview_on_image_editor.dart';
 import 'package:data_on_image_view/ui/widgets/dataview_on_image_settings_widget.dart';
 import 'package:data_on_image_view/ui/widgets/question_dialog_widget.dart';
 import 'package:data_on_image_view/utils/data_processor.dart';
+import 'package:file_provider/file_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
@@ -16,7 +16,7 @@ class DataViewOnImageState extends ChangeNotifier {
   Map<String, Map<String, String>> data = {};
   bool configChanged = false;
   bool get configSelected => selectedConfig != null;
-  final IFileProvider fileProvider = FileProvider.getInstance();
+  final fileProvider = FileProvider.getInstance();
 
   setSelectedConfig(String path) async {
     final file = File(path);
@@ -151,8 +151,7 @@ class DataViewOnImageState extends ChangeNotifier {
         context: context,
         title: "Select image file",
         allowedExtensions: ['png', 'jpg', 'jpeg']);
-    final imgPath = img.path;
-    conf = OverviewScreenConfig(path: imgPath, viewPorts: {});
+    conf = OverviewScreenConfig(path: img.path, viewPorts: {});
     if (!context.mounted) return;
     final name = await showAdaptiveDialog<String?>(
         context: context,
@@ -160,16 +159,13 @@ class DataViewOnImageState extends ChangeNotifier {
           return AlertDialog.adaptive(
             content: TextField(
               decoration: const InputDecoration(labelText: "Name"),
-              onSubmitted: (v) {
-                Navigator.of(context).pop(v);
-              },
+              onSubmitted: (v) => Navigator.of(context).pop(v),
             ),
           );
         });
     if (name == null) return;
     final dir = p.dirname(img.path);
     final path = p.join(dir, '$name.json');
-    // }
 
     File(path).writeAsStringSync(conf.toJson());
     addConfig(configPath: path);

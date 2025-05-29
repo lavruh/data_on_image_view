@@ -1,25 +1,25 @@
 name: data_on_image_view
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.1.0
+version: 1.1.1
 
 environment:
   sdk: '>=3.3.2 <4.0.0'
 dependencies:
   csv: ^6.0.0
-  file_picker: ^8.1.2
-  filesystem_picker: ^4.1.0
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.1.0
-  image: ^4.2.0
-  path: ^1.9.0
+  image: ^4.5.4
+  path: ^1.9.1
+  file_provider:
+    git: https://github.com/lavruh/file_provider.git
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
-  build_runner: ^2.4.12
+  flutter_lints: ^6.0.0
+  build_runner: ^2.4.15
 
 flutter:
   uses-material-design: true
