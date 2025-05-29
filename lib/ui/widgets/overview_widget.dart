@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 
 class OverviewWidget extends StatelessWidget {
   const OverviewWidget(
-      {Key? key,
+      {super.key,
       required this.img,
       required this.viewPorts,
-      required this.child})
-      : super(key: key);
+      required this.child});
 
   final File img;
   final Map<String, ViewPort> viewPorts;
@@ -16,7 +15,17 @@ class OverviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = const CircularProgressIndicator();
+    Widget content = const Center(
+        child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text("Image file does not exist. Select correct file."),
+        ),
+        CircularProgressIndicator(),
+      ],
+    ));
 
     if (img.existsSync()) {
       final image = FileImage(img);

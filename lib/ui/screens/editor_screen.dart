@@ -146,12 +146,6 @@ class _EditorScreenState extends State<EditorScreen> {
     }
   }
 
-  _goBack() {
-    final returnData =
-        OverviewScreenConfig(path: widget.config.path, viewPorts: ports);
-    Navigator.of(context).pop(returnData);
-  }
-
   void _removeViewPort(String oldID) {
     ports.remove(oldID);
   }
